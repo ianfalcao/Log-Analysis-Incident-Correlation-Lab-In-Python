@@ -5,6 +5,7 @@ Partes implementadas:
 1. Localização e validação do diretório de logs.
 2. Cenário 1: rastreamento da sessão do usuário admin.
 3. Cenário 2: correlação de erros HTTP 500 e exceções da aplicação.
+4. Cenário 3: identificação de brute-force e reconhecimento.
 """
 
 from __future__ import annotations
@@ -22,6 +23,7 @@ RESET = "\033[0m"
 
 ADMIN_IP = "192.168.1.4"
 ADMIN_USER = "admin"
+BRUTE_FORCE_IP = "10.0.0.6"
 
 
 def select_log_directory(directory: str | None) -> Path:
@@ -128,6 +130,37 @@ def analyze_internal_server_errors(log_dir: Path) -> None:
     print()
 
 
+def analyze_brute_force(log_dir: Path) -> None:
+    """Exibe evidências de reconhecimento e brute-force do IP atacante."""
+    print_header(f"[Cenário 3] Brute-Force e Reconhecimento ({BRUTE_FORCE_IP})")
+
+    access_log = log_dir / "access.log"
+    if access_log.is_file():
+        print(f"{GREEN}--> Varredura Web:{RESET}")
+        print_matches(
+            matching_lines(access_log, lambda line: BRUTE_FORCE_IP in line),
+            "Nenhum registro.",
+        )
+
+    auth_log = log_dir / "auth.log"
+    if auth_log.is_file():
+        print(f"\n{GREEN}--> Falhas de Autenticação SSH:{RESET}")
+        auth_events = matching_lines(auth_log, lambda line: BRUTE_FORCE_IP in line)
+        print_matches(auth_events, "Nenhum registro.")
+        failed_passwords = sum("Failed password" in line for line in auth_events)
+        print(f"Total de senhas incorretas: {RED}{failed_passwords}{RESET}")
+
+    firewall_log = log_dir / "firewall.log"
+    if firewall_log.is_file():
+        print(f"\n{GREEN}--> Ações do Firewall:{RESET}")
+        print_matches(
+            matching_lines(firewall_log, lambda line: BRUTE_FORCE_IP in line),
+            "Nenhum registro.",
+        )
+
+    print()
+
+
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Analisa e correlaciona arquivos de log do laboratório."
@@ -156,6 +189,7 @@ def main() -> int:
     print(f"{GREEN}[+] Lendo arquivos de log a partir do diretório: '{log_dir}'{RESET}\n")
     analyze_admin_session(log_dir)
     analyze_internal_server_errors(log_dir)
+    analyze_brute_force(log_dir)
     return 0
 
 
