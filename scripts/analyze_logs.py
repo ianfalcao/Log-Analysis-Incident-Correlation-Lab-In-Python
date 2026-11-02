@@ -1,14 +1,26 @@
 #!/usr/bin/env python3
+"""Automação de análise e correlação de logs.
+
+Partes implementadas:
+1. Localização e validação do diretório de logs.
+2. Cenário 1: rastreamento da sessão do usuário admin.
+"""
+
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
+from typing import Callable
+
 
 BLUE = "\033[0;34m"
 GREEN = "\033[0;32m"
 RED = "\033[0;31m"
 YELLOW = "\033[1;33m"
 RESET = "\033[0m"
+
+ADMIN_IP = "192.168.1.4"
+ADMIN_USER = "admin"
 
 
 def select_log_directory(directory: str | None) -> Path:
@@ -32,6 +44,52 @@ def print_banner() -> None:
     print(f"{BLUE}{'=' * 52}{RESET}\n")
 
 
+def print_header(title: str) -> None:
+    print(f"{YELLOW}{'-' * 52}{RESET}")
+    print(f"{YELLOW}{title}{RESET}")
+    print(f"{YELLOW}{'-' * 52}{RESET}")
+
+
+def matching_lines(log_file: Path, predicate: Callable[[str], bool]) -> list[str]:
+    """Retorna linhas do arquivo que atendem ao critério informado."""
+    return [
+        line
+        for line in log_file.read_text(encoding="utf-8", errors="replace").splitlines()
+        if predicate(line)
+    ]
+
+
+def print_matches(lines: list[str], empty_message: str) -> None:
+    print("\n".join(lines) if lines else empty_message)
+
+
+def analyze_admin_session(log_dir: Path) -> None:
+    """Exibe eventos de autenticação e web associados à sessão de admin."""
+    print_header(f"[Cenário 1] Sessão do Usuário Admin ({ADMIN_IP})")
+
+    auth_log = log_dir / "auth.log"
+    if auth_log.is_file():
+        print(f"{GREEN}--> Registros de Autenticação (auth.log):{RESET}")
+        print_matches(
+            matching_lines(
+                auth_log,
+                lambda line: "Accepted" in line
+                and (ADMIN_IP in line or ADMIN_USER in line),
+            ),
+            "Nenhum registro encontrado.",
+        )
+
+    access_log = log_dir / "access.log"
+    if access_log.is_file():
+        print(f"\n{GREEN}--> Registros do Web Server (access.log):{RESET}")
+        print_matches(
+            matching_lines(access_log, lambda line: ADMIN_IP in line),
+            "Nenhum registro encontrado.",
+        )
+
+    print()
+
+
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Analisa e correlaciona arquivos de log do laboratório."
@@ -47,7 +105,6 @@ def parse_arguments() -> argparse.Namespace:
 def main() -> int:
     args = parse_arguments()
     log_dir = select_log_directory(args.log_dir)
-
     print_banner()
 
     if not (log_dir / "access.log").is_file() and not (log_dir / "auth.log").is_file():
@@ -59,7 +116,7 @@ def main() -> int:
         return 1
 
     print(f"{GREEN}[+] Lendo arquivos de log a partir do diretório: '{log_dir}'{RESET}\n")
-    print(f"{YELLOW}Parte 1 concluída: ambiente preparado para análise.{RESET}")
+    analyze_admin_session(log_dir)
     return 0
 
 
