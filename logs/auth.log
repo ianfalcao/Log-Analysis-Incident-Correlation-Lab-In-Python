@@ -1,0 +1,33 @@
+Dec 30 10:01:15 my-server sshd[12101]: Accepted password for user admin from 192.168.1.4 port 51234 ssh2
+Dec 30 10:05:30 my-server sshd[12205]: Failed password for invalid user visitor from 10.0.0.5 port 48765 ssh2
+Dec 30 10:05:33 my-server sshd[12205]: Disconnected from invalid user visitor 10.0.0.5 port 48765 [preauth]
+Dec 30 10:09:40 my-server login[2102]: pam_unix(login:session): session opened for user regular_user by LOGIN(uid=0)
+Dec 30 10:09:45 my-server login[2102]: USER regular_user: Login successful.
+Dec 30 10:15:10 my-server sshd[13501]: Failed password for user admin from 10.0.0.6 port 50123 ssh2
+Dec 30 10:15:13 my-server sshd[13501]: Failed password for user admin from 10.0.0.6 port 50123 ssh2
+Dec 30 10:15:16 my-server sshd[13501]: Failed password for user admin from 10.0.0.6 port 50123 ssh2
+Dec 30 10:15:18 my-server sshd[13501]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.0.0.6  user=admin
+Dec 30 10:15:20 my-server sshd[13501]: error: PAM: Authentication failure for admin from 10.0.0.6
+Dec 30 10:15:22 my-server sshd[13501]: Failed password for user admin from 10.0.0.6 port 50123 ssh2
+Dec 30 10:15:25 my-server sshd[13501]: Failed password for user admin from 10.0.0.6 port 50123 ssh2
+Dec 30 10:15:27 my-server sshd[13502]: Disconnecting from authenticating user admin 10.0.0.6 port 50123 [preauth]
+Dec 30 10:18:00 my-server sudo:    test_user : TTY=pts/0 ; PWD=/home/test_user ; USER=root ; COMMAND=/usr/bin/apt-get update
+Dec 30 10:18:01 my-server sudo: pam_unix(sudo:session): session opened for user root by test_user(uid=0)
+Dec 30 10:20:15 my-server sshd[14100]: Accepted publickey for user dev_ops from 172.17.0.1 port 22 ssh2: RSA SHA256:AbCdEf123456
+Dec 30 10:25:05 my-server useradd[14250]: new user: name=temp_user, UID=1001, GID=1001, HOME=/home/temp_user, SHELL=/bin/bash
+Dec 30 10:25:06 my-server passwd[14251]: pam_unix(passwd:chauthtok): password changed for temp_user
+Dec 30 10:30:00 my-server sshd[14800]: Failed password for user root from 203.0.113.55 port 34567 ssh2
+Dec 30 10:30:03 my-server sshd[14800]: Failed password for user root from 203.0.113.55 port 34567 ssh2
+Dec 30 10:35:10 my-server userdel[15001]: delete user 'temp_user'
+Dec 30 10:35:10 my-server userdel[15001]: removed group 'temp_user' owned by 'temp_user'
+Dec 30 10:40:20 my-server CRON[15500]: pam_unix(cron:session): session opened for user backup_user by (uid=0)
+Dec 30 10:40:21 my-server CRON[15500]: pam_unix(cron:session): session closed for user backup_user
+Dec 30 10:41:00 my-server sshd[15621]: error: Received disconnect from 10.0.0.6 port 50124:11:  [preauth]
+Dec 30 10:41:00 my-server sshd[15621]: Disconnected from authenticating user admin 10.0.0.6 port 50124 [preauth]
+Dec 30 10:45:00 my-server sshd[15900]: Invalid user jsmith from 198.51.100.2 port 60123
+Dec 30 10:45:00 my-server sshd[15900]: input_userauth_request: invalid user jsmith [preauth]
+Dec 30 10:45:03 my-server sshd[15900]: Failed password for invalid user jsmith from 198.51.100.2 port 60123 ssh2
+Dec 30 10:45:05 my-server sshd[15900]: Disconnected from invalid user jsmith 198.51.100.2 port 60123 [preauth]
+Dec 30 11:00:00 my-server groupadd[16501]: group added to /etc/group: name=developers, GID=1100
+Dec 30 11:00:05 my-server usermod[16510]: add 'regular_user' to group 'developers'
+Dec 30 11:05:00 my-server login[3100]: FAILED LOGIN 1 FROM /dev/pts/1 FOR unknown_user, Authentication failure

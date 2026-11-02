@@ -1,0 +1,48 @@
+2025-12-30 10:00:00,123 INFO  [main] com.example.app.Main: Application starting up...
+2025-12-30 10:00:01,456 INFO  [main] com.example.app.DatabaseConnector: Connecting to database at jdbc:mysql://db.example.com:3306/prod_db
+2025-12-30 10:00:02,789 INFO  [main] com.example.app.DatabaseConnector: Database connection successful.
+2025-12-30 10:00:03,012 INFO  [main] com.example.app.service.UserService: User service initialized.
+2025-12-30 10:00:03,345 INFO  [main] com.example.app.service.ProductService: Product service initialized.
+2025-12-30 10:00:04,678 INFO  [main] com.example.app.Main: Application startup complete. Listening on port 8080.
+2025-12-30 10:01:15,901 INFO  [Thread-10] com.example.app.service.UserService: User 'admin' logged in successfully.
+2025-12-30 10:07:30,111 WARN  [Thread-12] com.example.app.service.ApiService: API endpoint /api/v1/user/123 is deprecated. Please use /api/v2/user/123.
+2025-12-30 10:07:30,112 ERROR [Thread-12] com.example.app.service.ApiService: Critical error processing request for user 123. User data not found.
+java.lang.NullPointerException: Cannot invoke "com.example.app.model.User.getName()" because "user" is null
+	at com.example.app.service.ApiService.processUserData(ApiService.java:150)
+	at com.example.app.service.ApiService.handleGetUserRequest(ApiService.java:85)
+	at com.example.app.controller.ApiController.doGet(ApiController.java:45)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:634)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:741)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at com.example.app.filter.AuthenticationFilter.doFilter(AuthenticationFilter.java:50)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.logging.log4j.web.Log4jServletFilter.doFilter(Log4jServletFilter.java:71)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:199)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:490)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
+	at org.apache.catalina.valves.AbstractAccessLogValve.invoke(AbstractAccessLogValve.java:678)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:408)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:861)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1579)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+2025-12-30 10:12:30,500 INFO  [Thread-15] com.example.app.service.ApiService: Successfully processed request for /api/v2/data?id=xyz
+2025-12-30 10:18:00,800 WARN  [main] com.example.app.ConfigLoader: Configuration property 'max_pool_size' is not set. Using default value of 10.
+2025-12-30 10:40:20,005 INFO  [Cron-Job-1] com.example.app.jobs.BackupJob: Starting nightly database backup job.
+2025-12-30 10:40:25,130 INFO  [Cron-Job-1] com.example.app.jobs.BackupJob: Database backup created successfully at /var/backups/db_20251230.sql.gz.
+2025-12-30 11:05:00,200 WARN  [Thread-21] com.example.app.service.ProductService: Low inventory for product SKU: PROD-12345. Only 5 items left.
