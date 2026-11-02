@@ -6,6 +6,7 @@ Partes implementadas:
 2. Cenário 1: rastreamento da sessão do usuário admin.
 3. Cenário 2: correlação de erros HTTP 500 e exceções da aplicação.
 4. Cenário 3: identificação de brute-force e reconhecimento.
+5. Cenário 4: correlação de eventos associados a um IP suspeito.
 """
 
 from __future__ import annotations
@@ -24,6 +25,7 @@ RESET = "\033[0m"
 ADMIN_IP = "192.168.1.4"
 ADMIN_USER = "admin"
 BRUTE_FORCE_IP = "10.0.0.6"
+SUSPICIOUS_IP = "10.0.0.5"
 
 
 def select_log_directory(directory: str | None) -> Path:
@@ -115,7 +117,7 @@ def analyze_internal_server_errors(log_dir: Path) -> None:
     if access_log.is_file():
         print(f"{GREEN}--> Requisições HTTP 500:{RESET}")
         print_matches(
-            matching_lines(access_log, lambda line: " 500 " in line),
+            matching_lines(access_log, lambda line: '" 500 ' in line),
             "Nenhum registro encontrado.",
         )
 
@@ -161,6 +163,26 @@ def analyze_brute_force(log_dir: Path) -> None:
     print()
 
 
+def analyze_suspicious_activity(log_dir: Path) -> None:
+    """Correlaciona eventos associados ao IP suspeito nos logs disponíveis."""
+    print_header(f"[Cenário 4] Atividade Suspeita ({SUSPICIOUS_IP})")
+
+    log_sections = (
+        ("access.log", "Registros do Web Server"),
+        ("firewall.log", "Ações do Firewall"),
+        ("auth.log", "Eventos de Autenticação SSH"),
+    )
+    for filename, title in log_sections:
+        log_file = log_dir / filename
+        if log_file.is_file():
+            print(f"{GREEN}--> {title} ({filename}):{RESET}")
+            print_matches(
+                matching_lines(log_file, lambda line: SUSPICIOUS_IP in line),
+                "Nenhum registro.",
+            )
+            print()
+
+
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Analisa e correlaciona arquivos de log do laboratório."
@@ -190,6 +212,8 @@ def main() -> int:
     analyze_admin_session(log_dir)
     analyze_internal_server_errors(log_dir)
     analyze_brute_force(log_dir)
+    analyze_suspicious_activity(log_dir)
+    print(f"{GREEN}[+] Análise concluída.{RESET}")
     return 0
 
 
