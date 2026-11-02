@@ -4,6 +4,7 @@
 Partes implementadas:
 1. Localização e validação do diretório de logs.
 2. Cenário 1: rastreamento da sessão do usuário admin.
+3. Cenário 2: correlação de erros HTTP 500 e exceções da aplicação.
 """
 
 from __future__ import annotations
@@ -63,6 +64,20 @@ def print_matches(lines: list[str], empty_message: str) -> None:
     print("\n".join(lines) if lines else empty_message)
 
 
+def matching_lines_with_context(
+    log_file: Path, text: str, context_lines: int
+) -> list[str]:
+    """Retorna cada ocorrência de texto e as linhas seguintes do log."""
+    lines = log_file.read_text(encoding="utf-8", errors="replace").splitlines()
+    matches: list[str] = []
+
+    for index, line in enumerate(lines):
+        if text in line:
+            matches.extend(lines[index : index + context_lines + 1])
+
+    return matches
+
+
 def analyze_admin_session(log_dir: Path) -> None:
     """Exibe eventos de autenticação e web associados à sessão de admin."""
     print_header(f"[Cenário 1] Sessão do Usuário Admin ({ADMIN_IP})")
@@ -84,6 +99,29 @@ def analyze_admin_session(log_dir: Path) -> None:
         print(f"\n{GREEN}--> Registros do Web Server (access.log):{RESET}")
         print_matches(
             matching_lines(access_log, lambda line: ADMIN_IP in line),
+            "Nenhum registro encontrado.",
+        )
+
+    print()
+
+
+def analyze_internal_server_errors(log_dir: Path) -> None:
+    """Correlaciona respostas HTTP 500 com o stack trace da aplicação."""
+    print_header("[Cenário 2] Erros Internos no Servidor (HTTP 500)")
+
+    access_log = log_dir / "access.log"
+    if access_log.is_file():
+        print(f"{GREEN}--> Requisições HTTP 500:{RESET}")
+        print_matches(
+            matching_lines(access_log, lambda line: " 500 " in line),
+            "Nenhum registro encontrado.",
+        )
+
+    app_error_log = log_dir / "app_error.log"
+    if app_error_log.is_file():
+        print(f"\n{GREEN}--> Rastreamento do Stack Trace (app_error.log):{RESET}")
+        print_matches(
+            matching_lines_with_context(app_error_log, "NullPointerException", 8),
             "Nenhum registro encontrado.",
         )
 
@@ -117,6 +155,7 @@ def main() -> int:
 
     print(f"{GREEN}[+] Lendo arquivos de log a partir do diretório: '{log_dir}'{RESET}\n")
     analyze_admin_session(log_dir)
+    analyze_internal_server_errors(log_dir)
     return 0
 
 
