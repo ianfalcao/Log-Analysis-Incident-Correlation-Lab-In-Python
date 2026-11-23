@@ -2,18 +2,12 @@
 
 import re
 from collections.abc import Iterable, Iterator
-from datetime import date
 from ipaddress import ip_address
 
 from loglab.models import Event
+from loglab.parsers.syslog import read_header
 
 
-MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
-HEADER = re.compile(
-    r"(?P<stamp>(?P<month>[A-Z][a-z]{2}) +(?P<day>\d{1,2}) "
-    r"(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d) (?P<host>\S+) "
-    r"(?P<process>[\w.-]+)(?:\[(?P<pid>\d+)\])?:[ \t]*(?P<body>.+)"
-)
 PEER = r"(?: from (?P<peer>\S+)(?: port (?P<port>\d+))?)?"
 SSH_AUTH = re.compile(
     r"(?P<result>Accepted|Failed) (?P<method>\S+) for "
@@ -92,26 +86,10 @@ def parse_auth_line(line: str, *, file: str, line_number: int) -> Event:
     """Preserva uma linha, inclusive quando o formato é inválido ou desconhecido."""
     event = Event(source="auth", event_type="auth_unrecognized", file=file,
                   line_start=line_number, line_end=line_number, raw_message=line)
-    header = HEADER.fullmatch(line.rstrip("\r\n"))
-    if not header:
-        event.event_type = "auth_invalid"
-        event.details["reason"] = "Cabeçalho syslog inválido ou mensagem ausente."
+    body = read_header(event)
+    if body is None:
         return event
-
-    body = header["body"]
-    process = header["process"]
-    event.raw_timestamp = header["stamp"]
-    event.host = header["host"]
-    event.details["process"] = process
-    try:
-        # Ano bissexto apenas para validar mês/dia, sem atribuir ano ao evento.
-        date(2000, MONTHS.index(header["month"]) + 1, int(header["day"]))
-    except ValueError:
-        event.event_type = "auth_invalid"
-        event.details["reason"] = "Data syslog inválida."
-        return event
-    if header["pid"]:
-        event.details["pid"] = int(header["pid"])
+    process = event.details["process"]
 
     if match := SESSION.fullmatch(body):
         event.event_type = f"session_{match['action']}"
